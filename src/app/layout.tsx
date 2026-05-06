@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: siteConfig.keywords,
+  keywords: [...siteConfig.keywords],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
   publisher: siteConfig.name,
@@ -75,6 +75,11 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     images: [siteConfig.socialImage],
+  },
+  other: {
+    "geo.region": siteConfig.region,
+    "geo.placename": `${siteConfig.city}, ${siteConfig.state}, India`,
+    ICBM: "20.5937, 72.9342",
   },
   robots: {
     index: true,
