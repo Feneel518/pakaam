@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Fraunces,
   Geist_Mono,
@@ -7,15 +7,7 @@ import {
   Tiro_Devanagari_Hindi,
 } from "next/font/google";
 import "./globals.css";
-import { GoogleAnalytics } from "@/components/analytics/google-analytics";
-import { WebVitals } from "@/components/analytics/web-vitals";
-import {
-  SiteFooter,
-  SiteHeader,
-  StickyOrderBar,
-} from "@/components/site/marketing";
-import { buildMetadata } from "@/lib/seo";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, siteUrl } from "@/lib/site";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -43,33 +35,69 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+const bingSiteVerification = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: {
-    default: "Pakaam | Orchard-Direct Valsad Kesar Mangoes",
-    template: "%s | Pakaam",
-  },
+  metadataBase: siteUrl,
   applicationName: siteConfig.name,
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
+  },
   description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
   category: "food",
-  verification: {
-    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION || undefined,
-    other: {
-      "msvalidate.01": process.env.NEXT_PUBLIC_BING_VERIFICATION || "",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: siteConfig.locale,
+    url: "/",
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: siteConfig.socialImage,
+        width: 1200,
+        height: 630,
+        alt: "Fresh Valsadi Kesar mangoes from Pakaam in Valsad, Gujarat",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [siteConfig.socialImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
-  ...buildMetadata({
-    title: "Pakaam | Orchard-Direct Valsad Kesar Mangoes",
-    description: siteConfig.description,
-    path: "/",
-    keywords: [
-      "Valsad Kesar mangoes",
-      "buy kesar mango online",
-      "orchard direct mangoes",
-      "mango delivery in India",
-      "naturally ripened mangoes",
-    ],
-  }),
+  verification: {
+    ...(googleSiteVerification ? { google: googleSiteVerification } : {}),
+    ...(bingSiteVerification
+      ? { other: { "msvalidate.01": bingSiteVerification } }
+      : {}),
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#143018",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -79,16 +107,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang={siteConfig.language}
       className={`${fraunces.variable} ${metamorphous.variable} ${tiro.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
       <body className={`${plusJakarta.className} min-h-full flex flex-col`}>
-        <GoogleAnalytics />
-        <WebVitals />
-        <SiteHeader />
-        <div className="flex-1 pb-28">{children}</div>
-        <SiteFooter />
-        <StickyOrderBar />
+        {children}
       </body>
     </html>
   );
